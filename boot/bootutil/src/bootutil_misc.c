@@ -3,7 +3,7 @@
  *
  * Copyright (c) 2017-2019 Linaro LTD
  * Copyright (c) 2016-2019 JUUL Labs
- * Copyright (c) 2019 Arm Limited
+ * Copyright (c) 2019-2020 Arm Limited
  *
  * Original license:
  *
@@ -37,6 +37,7 @@
 #include "bootutil/bootutil.h"
 #include "bootutil_priv.h"
 #include "bootutil/bootutil_log.h"
+#include "bootutil/fault_injection_hardening.h"
 #ifdef MCUBOOT_ENC_IMAGES
 #include "bootutil/enc_key.h"
 #endif
@@ -106,6 +107,38 @@ static const struct boot_swap_table boot_swap_tables[] = {
 
 #define BOOT_SWAP_TABLES_COUNT \
     (sizeof boot_swap_tables / sizeof boot_swap_tables[0])
+
+/**
+ * @brief Determine if the data at two memory addresses is equal
+ *
+ * @param s1    The first  memory region to compare.
+ * @param s2    The second memory region to compare.
+ * @param n     The amount of bytes to compare.
+ *
+ * @note        This function does not comply with the specification of memcmp,
+ *              so should not be considered a drop-in replacement.
+ *
+ * @return      0 if memory regions are equal.
+ */
+fih_int boot_secure_memequal(const void *s1, const void *s2, size_t n)
+{
+    size_t i;
+    uint8_t *s1_p = (uint8_t*) s1;
+    uint8_t *s2_p = (uint8_t*) s2;
+    fih_int ret = FIH_FAILURE;
+
+    for (i = 0; i < n; i++) {
+        if (s1_p[i] != s2_p[i]) {
+            goto out;;
+        }
+    }
+    if (i == n) {
+        ret = FIH_SUCCESS;
+    }
+
+out:
+    FIH_RET(ret);
+}
 
 static int
 boot_magic_decode(const uint32_t *magic)
