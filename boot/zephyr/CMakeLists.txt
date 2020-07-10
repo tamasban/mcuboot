@@ -100,6 +100,7 @@ zephyr_library_sources(
   ${BOOT_DIR}/bootutil/src/image_ec256.c
   ${BOOT_DIR}/bootutil/src/image_ed25519.c
   ${BOOT_DIR}/bootutil/src/bootutil_misc.c
+  ${BOOT_DIR}/bootutil/src/fault_injection_hardening.c
   )
 
 if(CONFIG_SINGLE_IMAGE_DFU)

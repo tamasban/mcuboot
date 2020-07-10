@@ -264,6 +264,45 @@ config BOOT_SHARE_DATA
 	bool "Save application specific data in shared memory area"
 	default n
 
+choice
+	prompt "Fault injection hardening profile"
+	default BOOT_FIH_PROFILE_NONE
+
+config BOOT_FIH_PROFILE_NONE
+	bool "No hardening against hardware level fault injection"
+	select BOOT_FIH_PROFILE_NONE
+	help
+	  No hardening in SW against hardware level fault injection: power or
+	  clock glitching, etc.
+
+config BOOT_FIH_PROFILE_MODERATE
+	bool "Moderate level hardening against hardware level fault injection"
+	select BOOT_FIH_PROFILE_MODERATE
+	help
+	  Moderate level hardening: Long global fail loop to avoid break out,
+	  control flow integrity check to discover discrepancy in expected code
+	  flow.
+
+config BOOT_FIH_PROFILE_MEDIUM
+	bool "Medium level hardening against hardware level fault injection"
+	select BOOT_FIH_PROFILE_MAX
+	help
+	  Medium level hardening: Long global fail loop to avoid break out,
+	  control flow integrity check to discover discrepancy in expected code
+	  flow, double variables to discover register or memory corruption.
+
+config BOOT_FIH_PROFILE_MAX
+	bool "Maximum level hardening against hardware level fault injection"
+	select BOOT_FIH_PROFILE_MAX
+	help
+	  Maximum level hardening: Long global fail loop to avoid break out,
+	  control flow integrity check to discover discrepancy in expected code
+	  flow, double variables to discover register or memory corruption, random
+	  delays to make code execution less predictable. Random delays requires an
+	  entropy source.
+
+endcoice
+
 config BOOT_WAIT_FOR_USB_DFU
 	bool "Wait for a prescribed duration to see if USB DFU is invoked"
 	default n
